@@ -6,6 +6,8 @@ import com.company.employees.repos.DepartmentRepo;
 import com.company.employees.repos.EmployeeRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +29,16 @@ public class EmployeeService {
         return employeeRepo.findAll();
     }
 
-    public Employee findById(Long id) {
-        return employeeRepo.findById(id).orElseThrow(() -> new IllegalArgumentException());
-    }
-
-    public Employee saveEmployee(Employee employee) {
+    public Employee saveEmployee(Employee employee) throws IllegalArgumentException {
         employee.setDepId(null);
+        if (employee.getFirstName() == null ||
+            employee.getLastName() == null ||
+            employee.getPhoneNumber() == null) {
+            throw new IllegalArgumentException();
+        }
+        if (phoneValidator(employee.getPhoneNumber())) {
+          throw new IllegalArgumentException();
+        }
         return employeeRepo.save(employee);
     }
 
@@ -89,5 +95,10 @@ public class EmployeeService {
     public void addDep(Department department) {
         departmentRepo.save(department);
     }
-
+    public boolean phoneValidator (String phoneNumber) {
+        String regex = "^\\+?[0-9. ()-]{10,25}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(phoneNumber);
+        return !matcher.matches();
+    }
 }

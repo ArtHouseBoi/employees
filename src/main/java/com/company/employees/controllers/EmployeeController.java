@@ -37,7 +37,11 @@ public class EmployeeController {
 
     @PostMapping (path = "/employee")
     private ResponseEntity<String> saveEmployee(@RequestBody Employee employee) {
-        employeeService.saveEmployee(employee);
+        try {
+            employeeService.saveEmployee(employee);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("data entered incorrectly");
+        }
         return ResponseEntity.ok().body("employee saved, id = " + employee.getId());
     }
 
